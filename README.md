@@ -42,13 +42,19 @@ Enhanced save_valid_files function to save the list of valid files to valid_scan
 
 
 
- Case 1:
-value= all records count. untitled4_validator_ all records count.py
+ Case 1:   value= all records count.
+ 
+ then    "untitled4_validator_ all records count.py"
 
 Eg: last row’s value =10        total rows=11.  -1
 
 
-Case 2: untitled7_validator_all records count excluding header_1.py
-Value = all records count excluding header. 
+
+
+
+
+Case 2: Value = all records count excluding header. 
+
+then "untitled7_validator_all records count excluding header_1.py"
  
 Eg: last row’s value= 9  total rows=11.         -2
