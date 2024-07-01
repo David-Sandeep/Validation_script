@@ -41,6 +41,44 @@ def detect_delimiter(file_path, compression):
         print("="*60)
         print(f"Error detecting delimiter in {file_path}: {e}")
         return None
+    
+
+def check_delimiter_consistency(file_path, compression, delimiter):
+    """Check if each line in the file contains the detected delimiter."""
+    print("="*60)
+    print(f"Checking delimiter consistency in file: {file_path} with compression: {compression}")
+    try:
+        line_count = 0
+        if compression == 'gzip':
+            import gzip
+            with gzip.open(file_path, 'rt') as f:
+                for line in f:
+                    line_count += 1
+                    if delimiter not in line:
+                        raise ValueError(f"Delimiter mismatch detected in file: {file_path} on line {line_count}")
+                    if line_count % 10000 == 0:
+                        print("="*60)
+                        print(f"Checked {line_count} lines so far...the current line is:\n {line}")
+        else:
+            with open(file_path, 'rt') as f:
+                for line in f:
+                    line_count += 1
+                    if delimiter not in line:
+                        raise ValueError(f"Delimiter mismatch detected in file: {file_path} on line {line_count}")
+                    if line_count % 10000 == 0:
+                        print("="*60)
+                        print(f"Checked {line_count} lines so far...the current line is:\n {line}")
+        print("="*60)
+        print(f"Delimiter consistency check passed for file: {file_path}")
+        return True
+    except Exception as e:
+        print("="*60)
+        print(f"Error checking delimiter consistency in {file_path}: {e}")
+        return False
+
+    
+    
+
 
 def count_rows(file_path, compression, delimiter):
     """Count the total number of rows in the file efficiently."""
@@ -90,7 +128,6 @@ def load_expected_columns(file_path):
 
 def validate_file(file_path):
     """Validate a single CSV or gzip-compressed values file."""
-    start_time = time.time()
     print("="*60)
     print(f"Validating file: {file_path}")
     try:
@@ -119,10 +156,10 @@ def validate_file(file_path):
             print("="*60)
             print(f"Format error detected in {file_path}")
             return False
-
-        elapsed_time = time.time() - start_time
-        print("="*60)
-        print(f"Scanned {file_path} successfully. Time taken: {elapsed_time:.2f} seconds")
+                
+        if not check_delimiter_consistency(file_path, compression, delimiter):
+            return False
+        
         return True
 
     except Exception as e:
@@ -162,20 +199,7 @@ def save_valid_files(valid_files):
         print("No valid files to save.")
 
 def main():
-    Tk().withdraw()
-    print("Do you want to select a file or a directory?")
-    print("1. File")
-    print("2. Directory")
-    choice = input("Enter 1 for file or 2 for directory: ").strip()
-
-    if choice == '1':
-        path = askopenfilename(title="Select a file")
-    elif choice == '2':
-        path = askdirectory(title="Select a directory")
-    else:
-        print("="*60)
-        print("Invalid choice. Please run the script again and choose 1 or 2.")
-        return
+    
 
     if not path:
         print("="*60)
@@ -183,7 +207,7 @@ def main():
         return
 
     valid_files = []
-
+    
     if os.path.isfile(path):
         print("="*60)
         print(f"Selected path is a file: {path}")
